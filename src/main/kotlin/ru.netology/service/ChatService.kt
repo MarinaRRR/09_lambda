@@ -5,9 +5,15 @@ import ru.netology.data.Message
 import ru.netology.exeptions.NotFoundException
 
 object ChatService{
-    private val chats = mutableListOf<Chat>()
+    private var chats = mutableListOf<Chat>()
     private var chatId = 0
     private var messageId = 0
+
+    fun clear(){
+        chats = mutableListOf()
+        chatId = 0
+        messageId = 0
+    }
 
     fun getChats(id: Int): List<Chat> {
         return chats.filter { it.senderId == id || it.recipientId == id }
@@ -25,7 +31,6 @@ object ChatService{
                 message.add("Нет сообщений")
             else{
                 val lastMessage = it.messages.takeLast(1)
-                println(lastMessage[0].text)
                 message.add(lastMessage[0].text)
             }
         }
@@ -48,9 +53,13 @@ object ChatService{
         messageId++
     }
 
-    fun deleteMessage(chatId: Int) {
+    fun deleteMessage(chatId: Int, messageId: Int) {
         val chat = chats.find { it.chatId == chatId } ?: throw NotFoundException("Чат не найден")
-        if (chat.messages.isEmpty()) deleteChat(chatId) else chat.messages.removeLast()
+        if (chat.messages.isEmpty()) deleteChat(chatId)
+        else {
+            chat.messages.removeIf { it.messageId == messageId }
+            if (chat.messages.isEmpty()) chat.empty = true
+        }
     }
     fun createChat(senderId: Int, recipientId: Int): Chat {
         val chat = Chat(chatId, senderId, recipientId)

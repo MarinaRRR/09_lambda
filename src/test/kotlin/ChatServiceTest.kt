@@ -2,12 +2,17 @@ package ru.netology
 import org.junit.Test
 
 import org.junit.Assert.*
+import org.junit.Before
 import ru.netology.data.Chat
 import ru.netology.data.Message
 import ru.netology.exeptions.NotFoundException
 import ru.netology.service.ChatService
 
 class ChatServiceTest {
+    @Before
+    fun clearBeforeTest() {
+        ChatService.clear()
+    }
 
     @Test
     fun createChat() {
@@ -27,8 +32,8 @@ class ChatServiceTest {
         val expected = mutableListOf<Chat>()
         expected.add(chat1)
         expected.add(chat2)
-        println(service.createChat(1, 2))
-        println(service.createChat(2, 4))
+        service.createChat(1, 2)
+        service.createChat(2, 4)
         val result = service.getChats(2)
 
         assertEquals(expected, result)
@@ -42,7 +47,7 @@ class ChatServiceTest {
         service.sendMessage(2, 4, "Сообщение3")
         val result = service.getUnreadChatsCount(1)
 
-        assertEquals(1, result)
+        assertEquals(2, result)
     }
 
     @Test
@@ -73,7 +78,7 @@ class ChatServiceTest {
         expected.add(message2)
         service.sendMessage(message1.senderId, message1.recipientId, message1.text)
         service.sendMessage(message2.senderId, message2.recipientId, message2.text)
-        val result = service.getMessage(1, 2, 2)
+        val result = service.getMessage(1, 0, 2)
 
         assertEquals(expected, result)
     }
@@ -89,9 +94,6 @@ class ChatServiceTest {
         service.sendMessage(message1.senderId, message1.recipientId, message1.text)
         service.sendMessage(message2.senderId, message2.recipientId, message2.text)
         val result = service.getMessage(1, 0, 2)
-        println(expected)
-        println(result)
-
 
         assertEquals(expected, result)
     }
@@ -124,7 +126,7 @@ class ChatServiceTest {
         val service = ChatService
         val expected = Chat(0, 1, 2, empty = true)
         service.sendMessage(1, 2, "Сообщение1")
-        service.deleteMessage(0)
+        service.deleteMessage(0, 0)
         val chatService = service.getChats(1)
         val result = chatService.last()
 
